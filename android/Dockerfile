@@ -20,9 +20,6 @@ RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools,t
 RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-2.9-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-2.9/bin
 ENV PATH ${PATH}:/opt/gradle-2.9/bin
 
-#install ssh-agent
-RUN 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-
 RUN which java
 RUN which android
 RUN which git
