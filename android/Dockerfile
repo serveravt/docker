@@ -27,6 +27,7 @@ ENV PATH ${PATH}:/opt/gradle-2.9/bin
 
 # Set up and run emulator
 RUN echo no | android create avd --force -n test -c 30M -t android-22
+ENV HOME /root
 
 ADD wait-for-emulator /usr/local/bin/
 ADD start-emulator /usr/local/bin/
@@ -43,4 +44,5 @@ RUN apt-get clean
 
 # GO to workspace
 RUN mkdir -p /opt/workspace
+VOLUME /root/.gradle
 WORKDIR /opt/workspace
