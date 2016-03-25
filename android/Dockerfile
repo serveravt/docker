@@ -14,17 +14,28 @@ ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 
 # Install sdk elements
 ENV PATH ${PATH}:/opt/tools
-RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools,tools,extra,build-tools-23.0.2,android-22,android-8
+RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools
+#RUN echo y | android --silent update sdk --no-ui --all --filter tools
+RUN echo y | android --silent update sdk --no-ui --all --filter extra
+RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.3
+RUN echo y | android --silent update sdk --no-ui --all --filter android-22,android-23,android-8
+RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
 
 #install gradle
 RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-2.9-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-2.9/bin
 ENV PATH ${PATH}:/opt/gradle-2.9/bin
 
+# Set up and run emulator
+RUN echo no | android create avd --force -n test -c 30M -t android-22
+
+ADD wait-for-emulator /usr/local/bin/
+ADD start-emulator /usr/local/bin/
+
 RUN which java
 RUN which android
 RUN which git
 RUN which gradle
-#RUN which adb
+RUN which adb
 
 
 # Cleaning
