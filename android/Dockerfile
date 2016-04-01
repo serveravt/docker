@@ -22,8 +22,8 @@ RUN echo y | android --silent update sdk --no-ui --all --filter android-22,andro
 RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
 
 #install gradle
-RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-2.9-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-2.9/bin
-ENV PATH ${PATH}:/opt/gradle-2.9/bin
+RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-2.12-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-2.12/bin
+ENV PATH ${PATH}:/opt/gradle-2.12/bin
 
 # Set up and run emulator
 RUN echo no | android create avd --force -n test -c 30M -t android-22
