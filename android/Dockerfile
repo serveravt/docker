@@ -4,7 +4,14 @@ MAINTAINER Artur Trofymchuk "artur@trofymchuk.net"
 
 # Install Deps
 RUN apt-get --quiet update --yes
-RUN apt-get --quiet install --yes wget tar git unzip openjdk-8-jdk lib32stdc++6 lib32z1
+
+RUN echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list
+
+RUN apt-get update && apt-get --quiet install --yes openjdk-8-jdk
+
+RUN update-alternatives --config java
+
+RUN apt-get --quiet install --yes wget tar git unzip lib32stdc++6 lib32z1
 # Install Android SDK
 RUN cd /opt && wget --output-document=android-sdk.tgz --quiet http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz && tar xzf android-sdk.tgz && rm -f android-sdk.tgz && chown -R root.root android-sdk-linux
 
