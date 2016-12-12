@@ -24,7 +24,7 @@ ENV PATH ${PATH}:/opt/tools
 RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools
 #RUN echo y | android --silent update sdk --no-ui --all --filter tools
 RUN echo y | android --silent update sdk --no-ui --all --filter extra
-RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3
+RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3,build-tools-25.0.0,build-tools-25.0.1
 RUN echo y | android --silent update sdk --no-ui --all --filter android-22,android-23,android-8
 RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
 
