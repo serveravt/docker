@@ -7,7 +7,12 @@ RUN apt-get --quiet update --yes
 
 RUN echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list
 
-RUN apt-get update && apt-get --quiet install --yes -f openjdk-7-jdk 
+# install oracle jdk 8
+RUN apt-get update && apt-get --quiet install --yes -f software-properties-common
+RUN add-apt-repository "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main"
+RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 seen true" | debconf-set-selections
+RUN apt-get update && apt-get --quiet install --yes -f oracle-java8-installer
 
 RUN update-alternatives --config java
 
@@ -26,18 +31,19 @@ RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools
 RUN echo y | android --silent update sdk --no-ui --all --filter extra
 RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3,build-tools-25.0.0,build-tools-25.0.1,build-tools-25.0.2
 RUN echo y | android --silent update sdk --no-ui --all --filter android-25,android-22,android-23,android-8,android-21
-RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
+
 
 #install gradle
 RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-3.4.1-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-3.4.1/bin
 ENV PATH ${PATH}:/opt/gradle-3.4.1/bin
-
-# Set up and run emulator
-RUN echo no | android create avd --force -n test -c 30M -t android-22
 ENV HOME /root
 
-ADD wait-for-emulator /usr/local/bin/
-ADD start-emulator /usr/local/bin/
+# Set up and run emulator
+#RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
+#RUN echo no | android create avd --force -n test -c 30M -t android-22
+#ADD wait-for-emulator /usr/local/bin/
+#ADD start-emulator /usr/local/bin/
+
 
 RUN which java
 RUN which android
