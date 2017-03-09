@@ -24,13 +24,13 @@ ENV PATH ${PATH}:/opt/tools
 RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools
 #RUN echo y | android --silent update sdk --no-ui --all --filter tools
 RUN echo y | android --silent update sdk --no-ui --all --filter extra
-RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3,build-tools-25.0.0,build-tools-25.0.1
-RUN echo y | android --silent update sdk --no-ui --all --filter android-25,android-22,android-23,android-8
+RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3,build-tools-25.0.0,build-tools-25.0.1,build-tools-25.0.2
+RUN echo y | android --silent update sdk --no-ui --all --filter android-25,android-22,android-23,android-8,android-21
 RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
 
 #install gradle
-RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-2.14.1-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-2.14.1/bin
-ENV PATH ${PATH}:/opt/gradle-2.14.1/bin
+RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-3.4.1-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-3.4.1/bin
+ENV PATH ${PATH}:/opt/gradle-3.4.1/bin
 
 # Set up and run emulator
 RUN echo no | android create avd --force -n test -c 30M -t android-22
