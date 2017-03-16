@@ -45,6 +45,8 @@ ENV HOME /root
 #ADD start-emulator /usr/local/bin/
 
 
+ADD licenses /opt/android-sdk-linux/
+
 RUN which java
 RUN which android
 RUN which git
