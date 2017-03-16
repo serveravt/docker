@@ -23,6 +23,8 @@ RUN cd /opt && wget --output-document=android-sdk.tgz --quiet http://dl.google.c
 # Setup environment
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+RUN mkdir /opt/android-sdk-linux/licenses
+ADD licenses/* /opt/android-sdk-linux/licenses/
 
 # Install sdk elements
 ENV PATH ${PATH}:/opt/tools
@@ -45,7 +47,7 @@ ENV HOME /root
 #ADD start-emulator /usr/local/bin/
 
 
-ADD licenses /opt/android-sdk-linux/
+
 
 RUN which java
 RUN which android
