@@ -43,8 +43,6 @@ RUN echo y | sdkmanager --verbose "extras;android;m2repository"
 RUN echo y | sdkmanager --verbose "extras;google;m2repository"
 RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
 RUN echo y | sdkmanager --verbose "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-RUN echo y | sdkmanager --verbose "extras;android;m2repository"
-RUN echo y | sdkmanager --verbose "extras;google;m2repository"
 RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
 
 #install gradle
