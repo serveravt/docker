@@ -16,9 +16,12 @@ RUN apt-get update && apt-get --quiet install --yes -f oracle-java8-installer
 
 RUN update-alternatives --config java
 
-RUN apt-get --quiet install --yes wget tar git unzip lib32stdc++6 lib32z1
+RUN apt-get --quiet install --yes wget git unzip lib32stdc++6 lib32z1
 # Install Android SDK
-RUN cd /opt && wget --output-document=android-sdk.tgz --quiet http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz && tar xzf android-sdk.tgz && rm -f android-sdk.tgz && chown -R root.root android-sdk-linux
+RUN mkdir /opt/android-sdk-linux
+RUN chown -R root.root /opt/android-sdk-linux
+RUN cd /opt/android-sdk-linux && wget --output-document=android-tools.zip --quiet https://dl.google.com/android/repository/tools_r25.2.3-linux.zip && unzip -q android-tools.zip && rm -f android-tools.zip
+
 
 # Setup environment
 ENV ANDROID_HOME /opt/android-sdk-linux
@@ -27,13 +30,20 @@ RUN mkdir /opt/android-sdk-linux/licenses
 ADD licenses/* /opt/android-sdk-linux/licenses/
 
 # Install sdk elements
-ENV PATH ${PATH}:/opt/tools
-RUN echo y | android --silent update sdk --no-ui --all --filter platform-tools
-#RUN echo y | android --silent update sdk --no-ui --all --filter tools
-RUN echo y | android --silent update sdk --no-ui --all --filter extra
-RUN echo y | android --silent update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.3,build-tools-25.0.0,build-tools-25.0.1,build-tools-25.0.2
-RUN echo y | android --silent update sdk --no-ui --all --filter android-25,android-22,android-23,android-8,android-21
+ENV PATH ${PATH}:/opt/android-sdk-linux/tools/bin
 
+RUN echo y | sdkmanager --verbose "platform-tools"
+
+RUN echo y | sdkmanager --verbose "platforms;android-25" 
+RUN echo y | sdkmanager --verbose "platforms;android-21"
+
+RUN echo y | sdkmanager --verbose "build-tools;25.0.2"
+
+RUN echo y | sdkmanager --verbose "extras;android;m2repository"
+RUN echo y | sdkmanager --verbose "extras;google;m2repository"
+RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
+RUN echo y | sdkmanager --verbose "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
 
 #install gradle
 RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-3.4.1-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-3.4.1/bin
