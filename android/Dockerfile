@@ -1,70 +1,56 @@
-FROM debian
+# docker build --rm --tag andbuild .
+# docker run --rm -v "{PROJ_PATH}":/proj/ --workdir="/proj/" andbuild /bin/sh -c "./gradlew clean assembleDebug"
+# docker run -it --rm -v {GRADLE_CACHE}:/root/.gradle/  -v "{PROJ_PATH}":/proj/ --workdir="/proj/" --entrypoint /bin/bash andbuild
+
+FROM debian:stretch
 
 MAINTAINER Artur Trofymchuk "artur@trofymchuk.net"
 
+ENV VERSION_BUILD_TOOLS "29.0.3"
+ENV VERSION_TARGET_SDK "29"
+
 # Install Deps
 RUN apt-get --quiet update --yes
+RUN apt-get --quiet install --yes apt-utils wget tar git unzip lib32stdc++6 lib32z1 rsync nano openjdk-8-jdk
 
-RUN echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list
-
-# install oracle jdk 8
-RUN apt-get update && apt-get --quiet install --yes -f software-properties-common
-RUN add-apt-repository "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main"
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 seen true" | debconf-set-selections
-RUN apt-get update && apt-get --quiet install --yes -f oracle-java8-installer
-
-RUN update-alternatives --config java
-
-RUN apt-get --quiet install --yes wget git unzip lib32stdc++6 lib32z1
 # Install Android SDK
-RUN mkdir /opt/android-sdk-linux
-RUN chown -R root.root /opt/android-sdk-linux
-RUN cd /opt/android-sdk-linux && wget --output-document=android-tools.zip --quiet https://dl.google.com/android/repository/tools_r25.2.3-linux.zip && unzip -q android-tools.zip && rm -f android-tools.zip
-
+RUN cd /opt && \
+    wget --output-document=android-sdk.zip --quiet https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && \
+    unzip android-sdk.zip -d android-sdk-linux && \
+    rm -f android-sdk.zip && chown -R root.root android-sdk-linux
 
 # Setup environment
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
-RUN mkdir /opt/android-sdk-linux/licenses
-ADD licenses/* /opt/android-sdk-linux/licenses/
+RUN mkdir -p $ANDROID_HOME/licenses/ \
+  && echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license \
+  && echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_HOME/licenses/android-sdk-preview-license
+
+RUN mkdir /root/.android
+RUN touch /root/.android/repositories.cfg
 
 # Install sdk elements
-ENV PATH ${PATH}:/opt/android-sdk-linux/tools/bin
-
-RUN echo y | sdkmanager --verbose "platform-tools"
-
-RUN echo y | sdkmanager --verbose "platforms;android-25" 
-RUN echo y | sdkmanager --verbose "platforms;android-21"
-
-RUN echo y | sdkmanager --verbose "build-tools;25.0.2"
-
-RUN echo y | sdkmanager --verbose "extras;android;m2repository"
-RUN echo y | sdkmanager --verbose "extras;google;m2repository"
-RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
-RUN echo y | sdkmanager --verbose "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-RUN echo y | sdkmanager --verbose "extras;google;google_play_services"
+RUN (while [ 1 ]; do sleep 5; echo y; done) | ${ANDROID_HOME}/tools/bin/sdkmanager \
+  "platform-tools" \
+  "platforms;android-${VERSION_TARGET_SDK}" \
+  "platforms;android-28" \
+  "platforms;android-27" \
+  "platforms;android-26" \
+  "build-tools;${VERSION_BUILD_TOOLS}" \
+  "extras;google;m2repository" "extras;google;google_play_services" "patcher;v4" --verbose
 
 #install gradle
-RUN cd /opt && wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-3.4.1-bin.zip && unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-3.4.1/bin
-ENV PATH ${PATH}:/opt/gradle-3.4.1/bin
+RUN cd /opt \
+	&& wget --quiet --output-document=gradle.zip https://services.gradle.org/distributions/gradle-6.5-all.zip \
+	&& unzip -q gradle.zip && rm -f gradle.zip && chown -R root.root /opt/gradle-6.5/bin
+ENV PATH ${PATH}:/opt/gradle-6.5/bin
 ENV HOME /root
-
-# Set up and run emulator
-#RUN echo y | android --silent update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
-#RUN echo no | android create avd --force -n test -c 30M -t android-22
-#ADD wait-for-emulator /usr/local/bin/
-#ADD start-emulator /usr/local/bin/
-
-
-
 
 RUN which java
 RUN which android
 RUN which git
 RUN which gradle
 RUN which adb
-
 
 # Cleaning
 RUN apt-get clean
@@ -73,3 +59,4 @@ RUN apt-get clean
 RUN mkdir -p /opt/workspace
 VOLUME /root/.gradle
 WORKDIR /opt/workspace
+COPY .bashrc /root/.bashrc
